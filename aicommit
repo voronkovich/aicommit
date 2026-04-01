@@ -118,7 +118,7 @@ ensure_staged_changes() {
 
 generate_prompt() {
     declare -r current_branch="$(git branch --show-current)"
-    declare -r recent_commits="$(git log --oneline -5 | sed 's/^/- /')"
+    declare -r recent_commits="$(recent_commits)"
     echo "
 Generate a commit message in Conventional Commits format.
 Rules:
@@ -128,10 +128,18 @@ Rules:
 - Keep under 72 characters
 - Use scope only when relevant
 Current branch: ${current_branch}
-Recent commits:
-${recent_commits}
+Recent commits: ${recent_commits}
 Analyze the diff and output only the commit message.
 "
+}
+
+recent_commits() {
+    if git rev-parse HEAD >/dev/null 2>&1; then
+        echo
+        git log --oneline -5 | sed 's/^/- /'
+    else
+        echo "No recent commits"
+    fi
 }
 
 main "$@"
