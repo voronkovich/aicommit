@@ -3,6 +3,7 @@
 set -euo pipefail
 shopt -s lastpipe nullglob dotglob
 
+declare -r app_name="${0##*/}"
 # AICOMMIT_CMD='qwen --prompt' aicommit
 declare -r cmd="${AICOMMIT_CMD:-gemini --prompt}"
 # https://www.conventionalcommits.org
@@ -16,36 +17,84 @@ Rules:
 - Use scope only when relevant
 Analyze the diff and output only the commit message.'
 
-if ! git rev-parse --is-inside-work-tree &>/dev/null; then
-    read -p "ℹ️ Not a git repository. Initialize a new one? (y/n): " -n 1 -r
-    echo
-    if [[ ! ${REPLY} =~ ^[Yy]$ ]]; then
-        echo "❌ Aborting: Git repository not initialized." >&2
-        exit 1
+main() {
+    while [[ $# -gt 0 ]]; do
+        case "${1:-}" in
+        --)
+            shift
+            break
+            ;;
+        -h | --help)
+            help
+            ;;
+        -*)
+            unknown_option "${1}"
+            ;;
+        *)
+            break
+            ;;
+        esac
+    done
+
+    if ! git rev-parse --is-inside-work-tree &>/dev/null; then
+        read -p "ℹ️ Not a git repository. Initialize a new one? (y/n): " -n 1 -r
+        echo
+        if [[ ! ${REPLY} =~ ^[Yy]$ ]]; then
+            fail "Git repository not initialized."
+        fi
+        info "Initializing new git repository..."
+        git init
+        git branch -M main
     fi
-    echo "Initializing new git repository..."
-    git init
-    git branch -M main
-fi
 
-if git diff --cached --exit-code --quiet; then
-    echo "⚠️ No staged changes found. Adding all changes..."
-    git add -A
-    git ls-files --deleted -z | xargs -r0 git rm
-fi
+    if git diff --cached --exit-code --quiet; then
+        info "No staged changes found. Adding all changes..."
+        git add -A
+        git ls-files --deleted -z | xargs -r0 git rm
+    fi
 
-if git diff --cached --exit-code --quiet; then
-    echo "❌ No changes to commit at all." >&2
-    exit 1
-fi
+    if git diff --cached --exit-code --quiet; then
+        fail "No changes to commit at all."
+    fi
 
-echo "🤖 Generating commit message..."
-declare -r commit_message="$(git diff --cached | ${cmd} "${prompt}" 2>/dev/null | tail -n1)"
+    info "Generating commit message..."
+    declare -r commit_message="$(git diff --cached | ${cmd} "${prompt}" 2>/dev/null | tail -n1)"
 
-if [[ -z "${commit_message}" ]]; then
-    echo "❌ Failed to generate commit message." >&2
-    exit 1
-fi
+    if [[ -z "${commit_message}" ]]; then
+        fail "Failed to generate commit message."
+    fi
 
-echo "✅ Generated commit message: ${commit_message}"
-git commit -m "${commit_message}"
+    echo "✅ Generated commit message: ${commit_message}"
+    git commit -m "${commit_message}"
+}
+
+help() {
+    echo -n "Usage: ${app_name} [options]
+
+Generate and commit with an AI-generated Conventional Commit message.
+
+Options:
+  -h, --help     Show this help message
+"
+    exit 0
+}
+
+unknown_option() {
+    fail "unknown option '${1}'
+Try '${app_name} --help' for more information."
+}
+
+fail() {
+    error "${1}"
+    exit "${2:-1}"
+}
+
+error() {
+    echo "${app_name}: ${1}" >&2
+}
+
+info() {
+    echo "${1}"
+}
+
+main "$@"
