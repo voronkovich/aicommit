@@ -69,8 +69,7 @@ main() {
 }
 
 help() {
-    cat <<EOF
-Usage: ${app_name} [options]
+    echo -n "Usage: ${app_name} [options]
 
 Generate an AI-powered commit message in Conventional Commits format and create the commit.
 
@@ -93,8 +92,7 @@ Conventional commits format:
 Examples:
   ${app_name}                    # Generate and commit with AI message
   ${app_name} --help             # Show this help
-
-EOF
+"
     exit 0
 }
 
