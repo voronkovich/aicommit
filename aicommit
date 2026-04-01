@@ -28,15 +28,7 @@ main() {
 
     ensure_git_repo
 
-    if git diff --cached --exit-code --quiet; then
-        info "No staged changes found. Adding all changes..."
-        git add -A
-        git ls-files --deleted -z | xargs -r0 git rm
-    fi
-
-    if git diff --cached --exit-code --quiet; then
-        fail "No changes to commit at all."
-    fi
+    ensure_staged_changes
 
     declare -r prompt="$(generate_prompt)"
 
@@ -110,6 +102,18 @@ ensure_git_repo() {
 
     git init
     git branch -M main
+}
+
+ensure_staged_changes() {
+    if git diff --cached --exit-code --quiet; then
+        info "No staged changes found. Adding all changes..."
+        git add -A
+        git ls-files --deleted -z | xargs -r0 git rm
+    fi
+
+    if git diff --cached --exit-code --quiet; then
+        fail "No changes to commit at all."
+    fi
 }
 
 generate_prompt() {
