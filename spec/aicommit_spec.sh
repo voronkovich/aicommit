@@ -39,6 +39,17 @@ Describe 'aicommit'
     echo "hello" > file.txt
   }
 
+  setup_repo_with_deleted_file() {
+    export TEST_DIR="$(mktemp -d)"
+    cd "${TEST_DIR}"
+    git init
+    git branch -M main
+    echo "hello" > file.txt
+    git add file.txt
+    git commit -m "add file"
+    rm file.txt
+  }
+
   It 'displays help message for -h'
     When call aicommit --help
     The status should be success
@@ -115,5 +126,31 @@ Describe 'aicommit'
     The output should include "No staged changes found. Adding all changes..."
     The output should include "Generating commit message..."
     The output should include "feat: add file"
+  End
+
+  It 'commits with staged changes and AI message'
+    BeforeCall setup_repo_with_changes
+    AfterCall cleanup_test_dir
+    Mock aicustomcmd
+      echo "feat: add hello"
+    End
+    export AICOMMIT_CMD=aicustomcmd
+    When call aicommit
+    The status should be success
+    The output should include "Generating commit message..."
+    The output should include "feat: add hello"
+  End
+
+  It 'auto-stages deleted file and commits'
+    BeforeCall setup_repo_with_deleted_file
+    AfterCall cleanup_test_dir
+    Mock aicustomcmd
+      echo "chore: remove file"
+    End
+    export AICOMMIT_CMD=aicustomcmd
+    When call aicommit
+    The status should be success
+    The output should include "No staged changes found. Adding all changes..."
+    The output should include "chore: remove file"
   End
 End
