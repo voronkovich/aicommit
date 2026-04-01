@@ -4,7 +4,6 @@ set -euo pipefail
 shopt -s lastpipe nullglob dotglob
 
 declare -r app_name="${0##*/}"
-# AICOMMIT_CMD='qwen --prompt' aicommit
 declare -r cmd="${AICOMMIT_CMD:-gemini --prompt}"
 
 main() {
