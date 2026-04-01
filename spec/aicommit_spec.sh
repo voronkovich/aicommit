@@ -12,6 +12,15 @@ Describe 'aicommit'
     fi
   }
 
+  setup_repo_with_changes() {
+    export TEST_DIR="$(mktemp -d)"
+    cd "${TEST_DIR}"
+    git init
+    git branch -M main
+    echo "hello" > file.txt
+    git add file.txt
+  }
+
   It 'displays help message for -h'
     When call aicommit --help
     The status should be success
@@ -56,5 +65,14 @@ Describe 'aicommit'
     The output should include "Not a git repository. Initialize a new one?"
     The path "${TEST_DIR}/.git" should not be directory
     The stderr should include "Git repository not initialized."
+  End
+
+  It 'fails when AI command returns empty commit message'
+    BeforeCall setup_repo_with_changes
+    AfterCall cleanup_test_dir
+    When call env AICOMMIT_CMD=true aicommit
+    The status should be failure
+    The output should include "Generating commit message..."
+    The stderr should include "Failed to generate commit message."
   End
 End
