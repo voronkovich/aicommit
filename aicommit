@@ -42,52 +42,6 @@ main() {
     git commit -m "${commit_message}"
 }
 
-help() {
-    echo -n "Usage: ${app_name} [options]
-
-Generate an AI-powered commit message in Conventional Commits format and create the commit.
-
-Analyzes staged changes using an AI model (default: gemini) to generate a concise
-commit message following Conventional Commits specifications. Automatically stages
-changes if none are staged, and can initialize a git repository if needed.
-
-Options:
-  -h, --help     Show this help message and exit
-
-Environment variables:
-  AICOMMIT_CMD   Command to use for AI generation (default: 'gemini --prompt')
-                 Examples: 'qwen --prompt', 'openai --prompt'
-
-Conventional commits format:
-  <type>(<scope>): <description>
-  Types: feat, fix, docs, style, refactor, perf, test, chore
-  Rules: imperative mood, lowercase, no period, under 72 characters
-
-Examples:
-  ${app_name}                    # Generate and commit with AI message
-  ${app_name} --help             # Show this help
-"
-    exit 0
-}
-
-unknown_option() {
-    fail "unknown option '${1}'
-Try '${app_name} --help' for more information."
-}
-
-fail() {
-    error "${1}"
-    exit "${2:-1}"
-}
-
-error() {
-    echo "${app_name}: ${1}" >&2
-}
-
-info() {
-    echo "${1}"
-}
-
 ensure_git_repo() {
     if git rev-parse --is-inside-work-tree &>/dev/null; then
         return
@@ -146,6 +100,52 @@ prepend_lines() {
     while read -r line; do
         printf "%s%s\n" "${1}" "${line}"
     done
+}
+
+help() {
+    echo -n "Usage: ${app_name} [options]
+
+Generate an AI-powered commit message in Conventional Commits format and create the commit.
+
+Analyzes staged changes using an AI model (default: gemini) to generate a concise
+commit message following Conventional Commits specifications. Automatically stages
+changes if none are staged, and can initialize a git repository if needed.
+
+Options:
+  -h, --help     Show this help message and exit
+
+Environment variables:
+  AICOMMIT_CMD   Command to use for AI generation (default: 'gemini --prompt')
+                 Examples: 'qwen --prompt', 'openai --prompt'
+
+Conventional commits format:
+  <type>(<scope>): <description>
+  Types: feat, fix, docs, style, refactor, perf, test, chore
+  Rules: imperative mood, lowercase, no period, under 72 characters
+
+Examples:
+  ${app_name}                    # Generate and commit with AI message
+  ${app_name} --help             # Show this help
+"
+    exit 0
+}
+
+unknown_option() {
+    fail "unknown option '${1}'
+Try '${app_name} --help' for more information."
+}
+
+fail() {
+    error "${1}"
+    exit "${2:-1}"
+}
+
+error() {
+    echo "${app_name}: ${1}" >&2
+}
+
+info() {
+    echo "${1}"
 }
 
 main "$@"
