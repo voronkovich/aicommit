@@ -71,18 +71,15 @@ ensure_staged_changes() {
 }
 
 generate_prompt() {
-    declare -r current_branch="$(git branch --show-current)"
-    declare -r recent_commits="$(recent_commits)"
-    echo "
-Generate a commit message in Conventional Commits format.
+    echo "Generate a commit message in Conventional Commits format.
 Rules:
 - Format: <type>(<scope>): <description>
 - Types: feat, fix, docs, style, refactor, perf, test, chore
 - Description: imperative mood, lowercase, no period
 - Keep under 72 characters
 - Use scope only when relevant
-Current branch: ${current_branch}
-Recent commits: ${recent_commits}
+Current branch: $(git branch --show-current)
+Recent commits: $(recent_commits)
 Analyze the diff and output only the commit message.
 "
 }
