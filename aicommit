@@ -69,13 +69,32 @@ main() {
 }
 
 help() {
-    echo -n "Usage: ${app_name} [options]
+    cat <<EOF
+Usage: ${app_name} [options]
 
-Generate and commit with an AI-generated Conventional Commit message.
+Generate an AI-powered commit message in Conventional Commits format and create the commit.
+
+Analyzes staged changes using an AI model (default: gemini) to generate a concise
+commit message following Conventional Commits specifications. Automatically stages
+changes if none are staged, and can initialize a git repository if needed.
 
 Options:
-  -h, --help     Show this help message
-"
+  -h, --help     Show this help message and exit
+
+Environment variables:
+  AICOMMIT_CMD   Command to use for AI generation (default: 'gemini --prompt')
+                 Examples: 'qwen --prompt', 'openai --prompt'
+
+Conventional commits format:
+  <type>(<scope>): <description>
+  Types: feat, fix, docs, style, refactor, perf, test, chore
+  Rules: imperative mood, lowercase, no period, under 72 characters
+
+Examples:
+  ${app_name}                    # Generate and commit with AI message
+  ${app_name} --help             # Show this help
+
+EOF
     exit 0
 }
 
