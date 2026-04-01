@@ -26,16 +26,7 @@ main() {
         esac
     done
 
-    if ! git rev-parse --is-inside-work-tree &>/dev/null; then
-        read -p "ℹ️ Not a git repository. Initialize a new one? (y/n): " -n 1 -r
-        echo
-        if [[ ! ${REPLY} =~ ^[Yy]$ ]]; then
-            fail "Git repository not initialized."
-        fi
-        info "Initializing new git repository..."
-        git init
-        git branch -M main
-    fi
+    ensure_git_repo
 
     if git diff --cached --exit-code --quiet; then
         info "No staged changes found. Adding all changes..."
@@ -103,6 +94,22 @@ error() {
 
 info() {
     echo "${1}"
+}
+
+ensure_git_repo() {
+    if git rev-parse --is-inside-work-tree &>/dev/null; then
+        return
+    fi
+
+    read -p "Not a git repository. Initialize a new one? (y/n): " -n 1 -r
+    echo
+    if [[ ! ${REPLY} =~ ^[Yy]$ ]]; then
+        fail "Git repository not initialized."
+    fi
+    info "Initializing new git repository..."
+
+    git init
+    git branch -M main
 }
 
 generate_prompt() {
