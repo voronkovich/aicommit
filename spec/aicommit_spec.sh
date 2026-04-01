@@ -21,6 +21,13 @@ Describe 'aicommit'
     git add file.txt
   }
 
+  setup_empty_repo() {
+    export TEST_DIR="$(mktemp -d)"
+    cd "${TEST_DIR}"
+    git init
+    git branch -M main
+  }
+
   It 'displays help message for -h'
     When call aicommit --help
     The status should be success
@@ -74,5 +81,14 @@ Describe 'aicommit'
     The status should be failure
     The output should include "Generating commit message..."
     The stderr should include "Failed to generate commit message."
+  End
+
+  It 'fails when there are no changes to commit'
+    BeforeCall setup_empty_repo
+    AfterCall cleanup_test_dir
+    When call aicommit
+    The status should be failure
+    The output should include "No staged changes found. Adding all changes..."
+    The stderr should include "No changes to commit at all."
   End
 End
