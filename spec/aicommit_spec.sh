@@ -28,6 +28,17 @@ Describe 'aicommit'
     git branch -M main
   }
 
+  setup_repo_with_unstaged_changes() {
+    export TEST_DIR="$(mktemp -d)"
+    cd "${TEST_DIR}"
+    git init
+    git branch -M main
+    echo "initial" > init.txt
+    git add init.txt
+    git commit -m "initial commit"
+    echo "hello" > file.txt
+  }
+
   It 'displays help message for -h'
     When call aicommit --help
     The status should be success
@@ -90,5 +101,19 @@ Describe 'aicommit'
     The status should be failure
     The output should include "No staged changes found. Adding all changes..."
     The stderr should include "No changes to commit at all."
+  End
+
+  It 'auto-stages changes and commits with AI message'
+    BeforeCall setup_repo_with_unstaged_changes
+    AfterCall cleanup_test_dir
+    Mock aicustomcmd
+      echo "feat: add file"
+    End
+    export AICOMMIT_CMD=aicustomcmd
+    When call aicommit
+    The status should be success
+    The output should include "No staged changes found. Adding all changes..."
+    The output should include "Generating commit message..."
+    The output should include "feat: add file"
   End
 End
