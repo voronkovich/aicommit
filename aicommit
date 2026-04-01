@@ -136,10 +136,16 @@ Analyze the diff and output only the commit message.
 recent_commits() {
     if git rev-parse HEAD >/dev/null 2>&1; then
         echo
-        git log --oneline -5 | sed 's/^/- /'
+        git log --oneline -5 | prepend_lines '- '
     else
         echo "No recent commits"
     fi
+}
+
+prepend_lines() {
+    while read -r line; do
+        printf "%s%s\n" "${1}" "${line}"
+    done
 }
 
 main "$@"
