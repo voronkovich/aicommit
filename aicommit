@@ -6,16 +6,6 @@ shopt -s lastpipe nullglob dotglob
 declare -r app_name="${0##*/}"
 # AICOMMIT_CMD='qwen --prompt' aicommit
 declare -r cmd="${AICOMMIT_CMD:-gemini --prompt}"
-# https://www.conventionalcommits.org
-declare -r prompt='
-Generate a commit message in Conventional Commits format.
-Rules:
-- Format: <type>(<scope>): <description>
-- Types: feat, fix, docs, style, refactor, perf, test, chore
-- Description: imperative mood, lowercase, no period
-- Keep under 72 characters
-- Use scope only when relevant
-Analyze the diff and output only the commit message.'
 
 main() {
     while [[ $# -gt 0 ]]; do
@@ -56,6 +46,8 @@ main() {
     if git diff --cached --exit-code --quiet; then
         fail "No changes to commit at all."
     fi
+
+    declare -r prompt="$(generate_prompt)"
 
     info "Generating commit message..."
     declare -r commit_message="$(git diff --cached | ${cmd} "${prompt}" 2>/dev/null | tail -n1)"
@@ -111,6 +103,24 @@ error() {
 
 info() {
     echo "${1}"
+}
+
+generate_prompt() {
+    declare -r current_branch="$(git branch --show-current)"
+    declare -r recent_commits="$(git log --oneline -5 | sed 's/^/- /')"
+    echo "
+Generate a commit message in Conventional Commits format.
+Rules:
+- Format: <type>(<scope>): <description>
+- Types: feat, fix, docs, style, refactor, perf, test, chore
+- Description: imperative mood, lowercase, no period
+- Keep under 72 characters
+- Use scope only when relevant
+Current branch: ${current_branch}
+Recent commits:
+${recent_commits}
+Analyze the diff and output only the commit message.
+"
 }
 
 main "$@"
