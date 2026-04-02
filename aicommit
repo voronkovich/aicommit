@@ -9,6 +9,10 @@ declare -r cmd="${AICOMMIT_CMD:-gemini --prompt}"
 main() {
     while [[ $# -gt 0 ]]; do
         case "${1:-}" in
+        --init-commits)
+            init_commits_file
+            exit 0
+            ;;
         --)
             shift
             break
@@ -71,17 +75,45 @@ ensure_staged_changes() {
 }
 
 generate_prompt() {
-    echo "Generate a commit message in Conventional Commits format.
-Rules:
-- Format: <type>(<scope>): <description>
+    echo "Generate a commit message."
+
+    declare -r repo_root="$(git rev-parse --show-toplevel)"
+    if [[ -f "${repo_root}/COMMITS.md" ]]; then
+        cat "${repo_root}/COMMITS.md"
+    else
+        conventional_commits
+    fi
+
+    echo "Current branch: $(git branch --show-current)"
+    echo "Recent commits: $(recent_commits)"
+    echo "Analyze the diff and output only the commit message."
+}
+
+init_commits_file() {
+    if ! git rev-parse --is-inside-work-tree &>/dev/null; then
+        fail "Not a git repository."
+    fi
+
+    declare -r repo_root="$(git rev-parse --show-toplevel)"
+    declare -r commits_file="${repo_root}/COMMITS.md"
+
+    if [[ -f "${commits_file}" ]]; then
+        fail "COMMITS.md already exists in repository root."
+    fi
+
+    conventional_commits >"${commits_file}"
+
+    info "Created COMMITS.md with default Conventional Commits rules."
+    info "Edit this file to customize commit message generation for your repository."
+}
+
+conventional_commits() {
+    echo 'Use [Conventional Commits](https://www.conventionalcommits.org/) format:
+- Format: `<type>(<scope>): <description>`
 - Types: feat, fix, docs, style, refactor, perf, test, chore
 - Description: imperative mood, lowercase, no period
 - Keep under 72 characters
-- Use scope only when relevant
-Current branch: $(git branch --show-current)
-Recent commits: $(recent_commits)
-Analyze the diff and output only the commit message.
-"
+- Use scope only when relevant'
 }
 
 recent_commits() {
@@ -102,18 +134,25 @@ prepend_lines() {
 help() {
     echo -n "Usage: ${app_name} [options]
 
-Generate an AI-powered commit message in Conventional Commits format and create the commit.
-
 Analyzes staged changes using an AI model (default: gemini) to generate a concise
-commit message following Conventional Commits specifications. Automatically stages
-changes if none are staged, and can initialize a git repository if needed.
+commit message following Conventional Commits specifications by default. Automatically
+stages changes if none are staged, and can initialize a git repository if needed.
+
+Custom commit rules can be defined by creating a COMMITS.md file in the repository root.
+Use --init-commits to create a sample COMMITS.md with default rules.
 
 Options:
-  -h, --help     Show this help message and exit
+  -h, --help       Show this help message and exit
+  --init-commits   Create a sample COMMITS.md file in repository root
 
 Environment variables:
-  AICOMMIT_CMD   Command to use for AI generation (default: 'gemini --prompt')
-                 Examples: 'qwen --prompt', 'openai --prompt'
+  AICOMMIT_CMD     Command to use for AI generation (default: 'gemini --prompt')
+                   Examples: 'qwen --prompt', 'openai --prompt'
+
+COMMITS.md file:
+  Place a COMMITS.md file in your repository root to define custom commit message rules.
+  The content will be used as the AI prompt for generating commit messages.
+  Use --init-commits to create a sample file with Conventional Commits rules.
 
 Conventional commits format:
   <type>(<scope>): <description>
@@ -122,6 +161,7 @@ Conventional commits format:
 
 Examples:
   ${app_name}                    # Generate and commit with AI message
+  ${app_name} --init-commits     # Create sample COMMITS.md file
   ${app_name} --help             # Show this help
 "
     exit 0
