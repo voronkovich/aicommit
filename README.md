@@ -42,6 +42,7 @@ Set the `AICOMMIT_CMD` environment variable to use a different AI model:
 ```bash
 export AICOMMIT_CMD="qwen --prompt"
 export AICOMMIT_CMD="aichat --prompt"
+export AICOMMIT_CMD="llm -m claude-4-opus"
 ```
 
 Default: `gemini --prompt`
