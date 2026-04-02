@@ -46,7 +46,7 @@ ensure_git_repo() {
         return
     fi
 
-    echo "Not a git repository. Initialize a new one? (y/n): "
+    echo -n "Not a git repository. Initialize a new one? (y/n): "
     read -n 1 -r
     echo
     if [[ ! ${REPLY} =~ ^[Yy]$ ]]; then
