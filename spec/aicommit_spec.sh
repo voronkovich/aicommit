@@ -148,4 +148,14 @@ Describe 'aicommit'
     The output should include "No staged changes found. Adding all changes..."
     The output should include "chore: remove file"
   End
+
+  It 'creates COMMITS.md file with --init-commits option'
+    setup_empty_repo
+    When call aicommit --init-commits
+    The status should be success
+    The output should include "Created COMMITS.md with default Conventional Commits rules."
+    The path "COMMITS.md" should be file
+    The contents of file "COMMITS.md" should include "Use [Conventional Commits]"
+    The contents of file "COMMITS.md" should include "Types: feat, fix, docs, style, refactor, perf, test, chore"
+  End
 End
