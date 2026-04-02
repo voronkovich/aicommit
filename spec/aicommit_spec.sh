@@ -18,24 +18,20 @@ Describe 'aicommit'
     setup_test_dir
   }
 
-  setup_repo_with_changes() {
-    setup_test_dir
-    git init
-    git branch -M main
-    echo "hello" > file.txt
-    git add file.txt
-  } >/dev/null
-
   setup_empty_repo() {
     setup_test_dir
     git init
     git branch -M main
   } >/dev/null
 
+  setup_repo_with_changes() {
+    setup_empty_repo
+    echo "hello" > file.txt
+    git add file.txt
+  } >/dev/null
+
   setup_repo_with_unstaged_changes() {
-    setup_test_dir
-    git init
-    git branch -M main
+    setup_empty_repo
     echo "initial" > init.txt
     git add init.txt
     git commit -m "initial commit"
@@ -43,9 +39,7 @@ Describe 'aicommit'
   } >/dev/null
 
   setup_repo_with_deleted_file() {
-    setup_test_dir
-    git init
-    git branch -M main
+    setup_empty_repo
     echo "hello" > file.txt
     git add file.txt
     git commit -m "add file"
@@ -53,9 +47,7 @@ Describe 'aicommit'
   } >/dev/null
 
   setup_repo_with_commits_md() {
-    setup_test_dir
-    git init
-    git branch -M main
+    setup_empty_repo
     echo "Use custom format: [TICKET-123] message" > COMMITS.md
     echo "hello" > file.txt
     git add file.txt
