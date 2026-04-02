@@ -51,7 +51,7 @@ Default: `gemini --prompt`
 
 ## Conventional Commits Format
 
-Generated commit messages follow this format:
+Generated commit messages follow [this format](https://www.conventionalcommits.org/):
 
 ```
 <type>(<scope>): <description>
