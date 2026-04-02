@@ -1,0 +1,17 @@
+name: CI
+on:
+  - push
+  - pull_request
+env:
+  SHELLSPEC_VERSION: 0.28.1
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          git config --global user.email "oleg-voronkovich@yandex.ru"
+          git config --global user.name "Oleg Voronkovich"
+          git config --global init.defaultBranch main
+      - run: curl -fsSL https://git.io/shellspec | sh -s ${SHELLSPEC_VERSION} --yes
+      - run: shellspec
