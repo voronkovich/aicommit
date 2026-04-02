@@ -52,6 +52,15 @@ Describe 'aicommit'
     rm file.txt
   } >/dev/null
 
+  setup_repo_with_commits_md() {
+    setup_test_dir
+    git init
+    git branch -M main
+    echo "Use custom format: [TICKET-123] message" > COMMITS.md
+    echo "hello" > file.txt
+    git add file.txt
+  } >/dev/null
+
   It 'displays help message for -h'
     When call aicommit --help
     The status should be success
@@ -157,5 +166,16 @@ Describe 'aicommit'
     The path "COMMITS.md" should be file
     The contents of file "COMMITS.md" should include "Use [Conventional Commits]"
     The contents of file "COMMITS.md" should include "Types: feat, fix, docs, style, refactor, perf, test, chore"
+  End
+
+  It 'uses COMMITS.md content as part of the prompt'
+    setup_repo_with_commits_md
+    Mock aicustomcmd
+      echo $*
+    End
+    export AICOMMIT_CMD=aicustomcmd
+    When call aicommit
+    The status should be success
+    The output should include "[TICKET-123] message"
   End
 End
