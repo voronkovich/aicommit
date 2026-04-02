@@ -20,7 +20,10 @@ Describe 'aicommit'
 
   setup_empty_repo() {
     setup_test_dir
+    mkdir -p "repo" && cd "repo"
     git init
+    git config user.email "test@example.com"
+    git config user.name "Test User"
     git branch -M main
   } >/dev/null
 
@@ -51,6 +54,28 @@ Describe 'aicommit'
     echo "Use custom format: [TICKET-123] message" > COMMITS.md
     echo "hello" > file.txt
     git add file.txt
+  } >/dev/null
+
+  setup_repo_with_home_commits_md() {
+    setup_empty_repo
+    echo "Use custom format from home" > "${TEST_DIR}/COMMITS.md"
+    echo "hello" > file.txt
+    git add file.txt
+  } >/dev/null
+
+  setup_repo_with_config_commits_md() {
+    setup_empty_repo
+    mkdir -p "${TEST_DIR}/.config"
+    echo "Use custom format from config" > "${TEST_DIR}/.config/COMMITS.md"
+    echo "hello" > file.txt
+    git add file.txt
+  } >/dev/null
+
+  setup_repo_with_all_commits_md() {
+    setup_repo_with_commits_md
+    echo "Use custom format from home" > "${TEST_DIR}/COMMITS.md"
+    mkdir -p "${TEST_DIR}/.config"
+    echo "Use custom format from config" > "${TEST_DIR}/.config/COMMITS.md"
   } >/dev/null
 
   It 'displays help message for -h'
@@ -167,6 +192,39 @@ Describe 'aicommit'
     End
     export AICOMMIT_CMD=aicustomcmd
     When call aicommit
+    The status should be success
+    The output should include "[TICKET-123] message"
+  End
+
+  It 'uses ~/COMMITS.md content as part of the prompt'
+    setup_repo_with_home_commits_md
+    Mock aicustomcmd
+      echo $*
+    End
+    export AICOMMIT_CMD=aicustomcmd
+    When call env HOME="${TEST_DIR}" aicommit
+    The status should be success
+    The output should include "custom format from home"
+  End
+
+  It 'uses ~/.config/COMMITS.md content as part of the prompt'
+    setup_repo_with_config_commits_md
+    Mock aicustomcmd
+      echo $*
+    End
+    export AICOMMIT_CMD=aicustomcmd
+    When call env HOME="${TEST_DIR}" aicommit
+    The status should be success
+    The output should include "custom format from config"
+  End
+
+  It 'uses repo COMMITS.md over any other file'
+    setup_repo_with_all_commits_md
+    Mock aicustomcmd
+      echo $*
+    End
+    export AICOMMIT_CMD=aicustomcmd
+    When call env HOME="${TEST_DIR}" aicommit
     The status should be success
     The output should include "[TICKET-123] message"
   End

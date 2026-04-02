@@ -76,9 +76,9 @@ ensure_staged_changes() {
 generate_prompt() {
     echo "Generate a commit message."
 
-    declare -r repo_root="$(git rev-parse --show-toplevel)"
-    if [[ -f "${repo_root}/COMMITS.md" ]]; then
-        cat "${repo_root}/COMMITS.md"
+    declare -r commits_file="$(find_commits_file)"
+    if [[ -n "${commits_file}" ]]; then
+        cat "${commits_file}"
     else
         conventional_commits
     fi
@@ -86,6 +86,24 @@ generate_prompt() {
     echo "Current branch: $(git branch --show-current)"
     echo "Recent commits: $(recent_commits)"
     echo "Analyze the diff and output only the commit message."
+}
+
+find_commits_file() {
+    declare -r repo_root="$(git rev-parse --show-toplevel)"
+    if [[ -f "${repo_root}/COMMITS.md" ]]; then
+        echo "${repo_root}/COMMITS.md"
+        return
+    fi
+
+    if [[ -f "${HOME}/COMMITS.md" ]]; then
+        echo "${HOME}/COMMITS.md"
+        return
+    fi
+
+    if [[ -f "${HOME}/.config/COMMITS.md" ]]; then
+        echo "${HOME}/.config/COMMITS.md"
+        return
+    fi
 }
 
 conventional_commits() {
@@ -137,21 +155,22 @@ Analyzes staged changes using an AI model (default: gemini) to generate a concis
 commit message following Conventional Commits specifications by default. Automatically
 stages changes if none are staged, and can initialize a git repository if needed.
 
-Custom commit rules can be defined by creating a COMMITS.md file in the repository root.
-Use --init-commits to create a sample COMMITS.md with default rules.
-
 Options:
   -h, --help       Show this help message and exit
   --init-commits   Create a sample COMMITS.md file in repository root
 
-Environment variables:
-  AICOMMIT_CMD     Command to use for AI generation (default: 'gemini --prompt')
-                   Examples: 'qwen --prompt', 'openai --prompt'
-
 COMMITS.md file:
   Place a COMMITS.md file in your repository root to define custom commit message rules.
   The content will be used as the AI prompt for generating commit messages.
+  The following locations are checked in order:
+  1. Current repository root
+  2. Home directory: ~/COMMITS.md
+  3. XDG: ~/.config/COMMITS.md
   Use --init-commits to create a sample file with Conventional Commits rules.
+
+Environment variables:
+  AICOMMIT_CMD     Command to use for AI generation (default: 'gemini --prompt')
+                   Examples: 'qwen --prompt', 'openai --prompt'
 
 Conventional commits format:
   <type>(<scope>): <description>
