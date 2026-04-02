@@ -83,6 +83,7 @@ generate_prompt() {
         conventional_commits
     fi
 
+    echo 'Here is some context from the repository:'
     echo "Current branch: $(git branch --show-current)"
     echo "Recent commits: $(recent_commits)"
     echo "Analyze the diff and output ONLY the commit message, without any additional text, comments, or markdown formatting."
