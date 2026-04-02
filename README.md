@@ -61,6 +61,22 @@ The `aicommit` script searches for `COMMITS.md` in the following order of preced
 
 The first `COMMITS.md` file found will be used. If no `COMMITS.md` file is found, the script defaults to the Conventional Commits specification.
 
+### `COMMITS.md` Example
+
+```markdown
+Generate a concise, conventional commit message in English, following these rules:
+
+- **Type**: Must be one of `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`.
+- **Scope (optional)**: Describe the part of the codebase affected.
+- **Description**: Imperative mood, lowercase, no period, under 72 characters.
+
+Examples:
+- feat: add user authentication module
+- fix(api): resolve null pointer exception in login endpoint
+- docs: update installation instructions
+- refactor: simplify database connection logic
+```
+
 To easily create a sample `COMMITS.md` file with default Conventional Commits rules in your project root, use the `--init-commits` option:
 
 ```bash
