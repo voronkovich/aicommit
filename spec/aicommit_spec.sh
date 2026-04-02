@@ -1,54 +1,56 @@
 Describe 'aicommit'
+  export TEST_DIR=""
+
   BeforeAll PATH="${PWD}:$PATH"
+  AfterEach cleanup
 
-  setup_no_repo_dir() {
-    export TEST_DIR="$(mktemp -d)"
-    cd "${TEST_DIR}"
-  }
-
-  cleanup_test_dir() {
+  cleanup() {
     if [[ -n "${TEST_DIR:-}" && -d "${TEST_DIR}" ]]; then
       rm -rf "${TEST_DIR}"
     fi
   }
 
+  setup_test_dir() {
+    TEST_DIR="$(mktemp -d)" && cd "${TEST_DIR}"
+  }
+
+  setup_no_repo_dir() {
+    setup_test_dir
+  }
+
   setup_repo_with_changes() {
-    export TEST_DIR="$(mktemp -d)"
-    cd "${TEST_DIR}"
+    setup_test_dir
     git init
     git branch -M main
     echo "hello" > file.txt
     git add file.txt
-  }
+  } >/dev/null
 
   setup_empty_repo() {
-    export TEST_DIR="$(mktemp -d)"
-    cd "${TEST_DIR}"
+    setup_test_dir
     git init
     git branch -M main
-  }
+  } >/dev/null
 
   setup_repo_with_unstaged_changes() {
-    export TEST_DIR="$(mktemp -d)"
-    cd "${TEST_DIR}"
+    setup_test_dir
     git init
     git branch -M main
     echo "initial" > init.txt
     git add init.txt
     git commit -m "initial commit"
     echo "hello" > file.txt
-  }
+  } >/dev/null
 
   setup_repo_with_deleted_file() {
-    export TEST_DIR="$(mktemp -d)"
-    cd "${TEST_DIR}"
+    setup_test_dir
     git init
     git branch -M main
     echo "hello" > file.txt
     git add file.txt
     git commit -m "add file"
     rm file.txt
-  }
+  } >/dev/null
 
   It 'displays help message for -h'
     When call aicommit --help
@@ -70,8 +72,7 @@ Describe 'aicommit'
   End
 
   It 'initializes a new git repo when user confirms'
-    BeforeCall setup_no_repo_dir
-    AfterCall cleanup_test_dir
+    setup_no_repo_dir
     Data
       #|y
     End
@@ -79,26 +80,24 @@ Describe 'aicommit'
     The status should be failure
     The output should include "Not a git repository. Initialize a new one?"
     The output should include "Initializing new git repository..."
-    The path "${TEST_DIR}/.git" should be directory
+    The path ".git" should be directory
     The stderr should include "No changes to commit at all."
   End
 
   It 'fails when user declines to initialize git repo'
-    BeforeCall setup_no_repo_dir
-    AfterCall cleanup_test_dir
+    setup_no_repo_dir
     Data
       #|n
     End
     When call aicommit
     The status should be failure
     The output should include "Not a git repository. Initialize a new one?"
-    The path "${TEST_DIR}/.git" should not be directory
+    The path ".git" should not be directory
     The stderr should include "Git repository not initialized."
   End
 
   It 'fails when AI command returns empty commit message'
-    BeforeCall setup_repo_with_changes
-    AfterCall cleanup_test_dir
+    setup_repo_with_changes
     When call env AICOMMIT_CMD=true aicommit
     The status should be failure
     The output should include "Generating commit message..."
@@ -106,8 +105,7 @@ Describe 'aicommit'
   End
 
   It 'fails when there are no changes to commit'
-    BeforeCall setup_empty_repo
-    AfterCall cleanup_test_dir
+    setup_empty_repo
     When call aicommit
     The status should be failure
     The output should include "No staged changes found. Adding all changes..."
@@ -115,8 +113,7 @@ Describe 'aicommit'
   End
 
   It 'auto-stages changes and commits with AI message'
-    BeforeCall setup_repo_with_unstaged_changes
-    AfterCall cleanup_test_dir
+    setup_repo_with_unstaged_changes
     Mock aicustomcmd
       echo "feat: add file"
     End
@@ -129,8 +126,7 @@ Describe 'aicommit'
   End
 
   It 'commits with staged changes and AI message'
-    BeforeCall setup_repo_with_changes
-    AfterCall cleanup_test_dir
+    setup_repo_with_changes
     Mock aicustomcmd
       echo "feat: add hello"
     End
@@ -142,8 +138,7 @@ Describe 'aicommit'
   End
 
   It 'auto-stages deleted file and commits'
-    BeforeCall setup_repo_with_deleted_file
-    AfterCall cleanup_test_dir
+    setup_repo_with_deleted_file
     Mock aicustomcmd
       echo "chore: remove file"
     End
