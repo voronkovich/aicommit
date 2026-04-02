@@ -119,7 +119,7 @@ conventional_commits() {
 recent_commits() {
     if git rev-parse HEAD >/dev/null 2>&1; then
         echo
-        git log --oneline -5 | prepend_lines '- '
+        git log --oneline -10 | prepend_lines '- '
     else
         echo "No recent commits"
     fi
