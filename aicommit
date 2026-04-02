@@ -35,7 +35,7 @@ main() {
     declare -r prompt="$(generate_prompt)"
 
     info "Generating commit message..."
-    declare -r commit_message="$(git diff --cached | ${cmd} "${prompt}" 2>/dev/null | tail -n1)"
+    declare -r commit_message="$(git diff --cached | ${cmd} "${prompt}" 2>/dev/null)"
 
     if [[ -z "${commit_message}" ]]; then
         fail "Failed to generate commit message."
@@ -74,7 +74,7 @@ ensure_staged_changes() {
 }
 
 generate_prompt() {
-    echo "Generate a commit message."
+    echo "Generate a commit message using following rules."
 
     declare -r commits_file="$(find_commits_file)"
     if [[ -n "${commits_file}" ]]; then
@@ -85,7 +85,7 @@ generate_prompt() {
 
     echo "Current branch: $(git branch --show-current)"
     echo "Recent commits: $(recent_commits)"
-    echo "Analyze the diff and output only the commit message."
+    echo "Analyze the diff and output ONLY the commit message, without any additional text, comments, or markdown formatting."
 }
 
 find_commits_file() {
