@@ -49,6 +49,24 @@ export AICOMMIT_CMD="llm -m claude-4-opus"
 
 Default: `gemini --prompt`
 
+## Custom Commit Rules
+
+You can customize the AI prompt used for generating commit messages by creating a `COMMITS.md` file. This file allows you to define specific rules, guidelines, or examples that the AI should follow.
+
+The `aicommit` script searches for `COMMITS.md` in the following order of precedence:
+
+1.  **Project Root**: `./COMMITS.md` (specific to the current repository)
+2.  **User Home Directory**: `~/COMMITS.md` (global for the current user)
+3.  **User Config Directory**: `~/.config/COMMITS.md` (global for the current user)
+
+The first `COMMITS.md` file found will be used. If no `COMMITS.md` file is found, the script defaults to the Conventional Commits specification.
+
+To easily create a sample `COMMITS.md` file with default Conventional Commits rules in your project root, use the `--init-commits` option:
+
+```bash
+aicommit --init-commits
+```
+
 ## Conventional Commits Format
 
 Generated commit messages follow [this format](https://www.conventionalcommits.org/):

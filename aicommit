@@ -163,9 +163,9 @@ COMMITS.md file:
   Place a COMMITS.md file in your repository root to define custom commit message rules.
   The content will be used as the AI prompt for generating commit messages.
   The following locations are checked in order:
-  1. Current repository root
-  2. Home directory: ~/COMMITS.md
-  3. XDG: ~/.config/COMMITS.md
+  1.  Project root:          ./COMMITS.md         (specific to the current repository)
+  2.  User home directory:   ~/COMMITS.md         (global for the current user)
+  3.  User config directory: ~/.config/COMMITS.md (global for the current user)
   Use --init-commits to create a sample file with Conventional Commits rules.
 
 Environment variables:
