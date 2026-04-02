@@ -1,5 +1,7 @@
 # aicommit
 
+[![CI](https://github.com/voronkovich/aicommit/actions/workflows/test.yml/badge.svg)](https://github.com/voronkovich/aicommit/actions/workflows/test.yml)
+
 A simple Bash script that generates AI-powered commit messages in [Conventional Commits](https://www.conventionalcommits.org) format.
 
 ## Features
