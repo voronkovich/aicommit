@@ -6,7 +6,7 @@ A simple Bash script that generates AI-powered commit messages in [Conventional 
 
 ## Features
 
-- **AI-Powered**: Uses AI models (default: [gemini](https://geminicli.com/)) to analyze your staged changes and generate meaningful commit messages
+- **AI-Powered**: Uses external AI CLI tools (default: [gemini](https://geminicli.com/)) to analyze your staged changes and generate meaningful commit messages. It does not make direct API calls.
 - **Conventional Commits**: Follows the Conventional Commits specification for consistent commit messages
 - **Auto-Stage**: Automatically stages all changes if none are currently staged
 - **Git Repo Init**: Can initialize a new git repository if you're not in one
