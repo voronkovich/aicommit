@@ -67,7 +67,7 @@ The first `COMMITS.md` file found will be used. If no `COMMITS.md` file is found
 ### `COMMITS.md` Example
 
 ```markdown
-Generate a concise, conventional commit message in English, following these rules:
+Use [Conventional Commits](https://www.conventionalcommits.org/) format:
 
 - **Type**: Must be one of `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`.
 - **Scope (optional)**: Describe the part of the codebase affected.
