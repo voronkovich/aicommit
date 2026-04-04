@@ -12,12 +12,12 @@ main() {
         --init-commits)
             init_commits_file
             ;;
+        -h | --help)
+            help
+            ;;
         --)
             shift
             break
-            ;;
-        -h | --help)
-            help
             ;;
         -*)
             unknown_option "${1}"
