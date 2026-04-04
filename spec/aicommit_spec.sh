@@ -228,4 +228,15 @@ Describe 'aicommit'
     The status should be success
     The output should include "[TICKET-123] message"
   End
+
+  It 'displays settings with --info option'
+    setup_repo_with_commits_md
+    export AICOMMIT_CMD="custom_cmd --arg"
+    When call aicommit --info
+    The status should be success
+    The output should include "AI Command: custom_cmd --arg"
+    The output should include "COMMITS.md: ${PWD}/COMMITS.md"
+    The output should include "Prompt"
+    The output should include "Use custom format: [TICKET-123] message"
+  End
 End

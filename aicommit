@@ -12,6 +12,9 @@ main() {
         --init-commits)
             init_commits_file
             ;;
+        --info)
+            show_info
+            ;;
         -h | --help)
             help
             ;;
@@ -131,6 +134,28 @@ prepend_lines() {
     done
 }
 
+show_info() {
+    ensure_git_repo
+
+    echo "AI Command: ${cmd}"
+
+    echo
+    declare -r commits_file="$(find_commits_file)"
+    if [[ -n "${commits_file}" ]]; then
+        echo "COMMITS.md: ${commits_file}"
+    else
+        echo "COMMITS.md: not found, using default Conventional Commits."
+    fi
+
+    echo
+    echo "Prompt"
+    echo "------"
+    generate_prompt
+    echo "------"
+
+    exit 0
+}
+
 init_commits_file() {
     ensure_git_repo
 
@@ -159,6 +184,7 @@ stages changes if none are staged, and can initialize a git repository if needed
 Options:
   -h, --help       Show this help message and exit
   --init-commits   Create a sample COMMITS.md file in repository root
+  --info           Show current settings and exit
 
 COMMITS.md file:
   Place a COMMITS.md file in your repository root to define custom commit message rules.

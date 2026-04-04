@@ -35,6 +35,9 @@ aicommit
 
 # Show help
 aicommit --help
+
+# Show current settings (AI command, COMMITS.md path, and prompt)
+aicommit --info
 ```
 
 ## Configuration
