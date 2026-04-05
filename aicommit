@@ -4,6 +4,7 @@ set -euo pipefail
 shopt -s lastpipe nullglob dotglob
 
 declare -r app_name="${0##*/}"
+declare -r app_version="1.0"
 declare -r cmd="${AICOMMIT_CMD:-gemini --prompt}"
 
 main() {
@@ -14,6 +15,9 @@ main() {
             ;;
         --info)
             show_info
+            ;;
+        --version)
+            show_version
             ;;
         -h | --help)
             help
@@ -153,6 +157,11 @@ show_info() {
     generate_prompt
     echo "------"
 
+    exit 0
+}
+
+show_version() {
+    echo "${app_name} ${app_version}"
     exit 0
 }
 
