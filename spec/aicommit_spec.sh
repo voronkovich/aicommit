@@ -187,10 +187,7 @@ Describe 'aicommit'
 
   It 'uses COMMITS.md content as part of the prompt'
     setup_repo_with_commits_md
-    Mock aicustomcmd
-      echo $*
-    End
-    export AICOMMIT_CMD=aicustomcmd
+    export AICOMMIT_CMD=cat
     When call aicommit
     The status should be success
     The output should include "[TICKET-123] message"
@@ -198,10 +195,7 @@ Describe 'aicommit'
 
   It 'uses ~/COMMITS.md content as part of the prompt'
     setup_repo_with_home_commits_md
-    Mock aicustomcmd
-      echo $*
-    End
-    export AICOMMIT_CMD=aicustomcmd
+    export AICOMMIT_CMD=cat
     When call env HOME="${TEST_DIR}" aicommit
     The status should be success
     The output should include "custom format from home"
@@ -209,10 +203,7 @@ Describe 'aicommit'
 
   It 'uses ~/.config/COMMITS.md content as part of the prompt'
     setup_repo_with_config_commits_md
-    Mock aicustomcmd
-      echo $*
-    End
-    export AICOMMIT_CMD=aicustomcmd
+    export AICOMMIT_CMD=cat
     When call env HOME="${TEST_DIR}" aicommit
     The status should be success
     The output should include "custom format from config"
@@ -220,10 +211,7 @@ Describe 'aicommit'
 
   It 'uses repo COMMITS.md over any other file'
     setup_repo_with_all_commits_md
-    Mock aicustomcmd
-      echo $*
-    End
-    export AICOMMIT_CMD=aicustomcmd
+    export AICOMMIT_CMD=cat
     When call env HOME="${TEST_DIR}" aicommit
     The status should be success
     The output should include "[TICKET-123] message"

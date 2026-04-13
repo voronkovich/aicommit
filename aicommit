@@ -5,7 +5,7 @@ shopt -s lastpipe nullglob dotglob
 
 declare -r app_name="${0##*/}"
 declare -r app_version="1.0"
-declare -r cmd="${AICOMMIT_CMD:-gemini --prompt}"
+declare -r cmd="${AICOMMIT_CMD:-gemini}"
 
 main() {
     while [[ $# -gt 0 ]]; do
@@ -39,10 +39,8 @@ main() {
 
     ensure_staged_changes
 
-    declare -r prompt="$(generate_prompt)"
-
     info "Generating commit message..."
-    declare -r commit_message="$(git diff --cached | ${cmd} "${prompt}" 2>/dev/null)"
+    declare -r commit_message="$(generate_commit_message)"
 
     if [[ -z "${commit_message}" ]]; then
         fail "Failed to generate commit message."
@@ -78,6 +76,10 @@ ensure_staged_changes() {
     if git diff --cached --exit-code --quiet; then
         fail "No changes to commit at all."
     fi
+}
+
+generate_commit_message() {
+    (generate_prompt && git diff --cached) | ${cmd} 2>/dev/null
 }
 
 generate_prompt() {
@@ -205,8 +207,8 @@ COMMITS.md file:
   Use --init-commits to create a sample file with Conventional Commits rules.
 
 Environment variables:
-  AICOMMIT_CMD     Command to use for AI generation (default: 'gemini --prompt')
-                   Examples: 'qwen --prompt', 'openai --prompt'
+  AICOMMIT_CMD     Command to use for AI generation (default: 'gemini')
+                   Examples: 'qwen', 'llm -m claude-4-opus'
 
 Conventional commits format:
   <type>(<scope>): <description>
